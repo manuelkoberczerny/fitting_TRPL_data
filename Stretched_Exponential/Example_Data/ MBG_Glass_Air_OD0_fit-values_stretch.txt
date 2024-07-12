@@ -1,0 +1,3 @@
+Sample Name	Fluence(cm-2)	tau_char (ns)	stretch	tau_avg (ns)	tau-1/e (ns)	pile_up_rate (%)	t=0-value	Fluence_old (nJ cm-2)	A-parameter
+ MBG_Glass_Air_OD0	38079910000.0	315.72	0.83	348.83		2.002		14.964197869394294	0.61
+ MBG_Glass_Air_OD1	3807991000.0	509.56	0.83	562.99		1.848		1.4964197869394293	0.8
