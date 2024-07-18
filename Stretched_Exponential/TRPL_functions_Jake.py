@@ -129,11 +129,12 @@ def remove_bckg(max_locator, Data):
 def make_Dataframe(time, data_raw, len_Data, max_locator):
 
     Data = pd.DataFrame()
+    Data_raw = pd.DataFrame()
 
     ## The data is cut to the correct lengths and stored in a pd.Dataframe
 
     Data['Time'] = time[0]
-    Data['0'] = data_raw[0]
+    Data_raw['0'] = data_raw[0]
 
 
     i = 1
@@ -157,11 +158,11 @@ def make_Dataframe(time, data_raw, len_Data, max_locator):
             else:
                 Data2 = np.append(Data2,np.zeros(a2))
 
-        Data[str(i)] = Data2
+        Data_raw[str(i)] = Data2
 
         i += 1
 
-
+    Data['0'] = Data_raw.mean(axis=1)
     max_locator = max_locator[0]
 
     return Data, max_locator
@@ -215,9 +216,9 @@ def residual2(params, time_fit, Data, limit, i):
 
 def resid_global(params_ode, time_fit, Data, limit, resid, param_dict):
 
-    for i,_ in enumerate(Data.columns.values[1:]):
-        data = Data[param_dict['Sample Name'][i]]
-        resid[i,:] = residual2(params_ode, time_fit, data, limit, i)#* time_fit
+    i = 0
+    data = Data[param_dict['Sample Name'][0]]
+    resid = residual2(params_ode, time_fit, data, limit, i)#* time_fit
 
     return resid.flatten()
 
@@ -282,8 +283,7 @@ def import_data(data_folder, FileNames, laser_reference_file, laser_intensity):
     param_dict.loc[:,'Fluence_old (nJ cm-2)'] = laser_fluence_old
 
 
-    for i, _ in enumerate(FileNames):
-        Data = Data.rename({str(i): param_dict['Sample Name'][i]}, axis='columns')
+    Data = Data.rename({'0': param_dict['Sample Name'][0]}, axis='columns')
 
 
     return Data, param_dict
@@ -298,17 +298,14 @@ def fit_stretched_exponential(Data, Fit_range, t_0_equals_1, share_stretch_facto
 
     ### Define Fitting Parameters
     params_ode = Parameters()
-    for i, _ in enumerate(Data.columns.values[1:]):
-        params_ode.add(f'tau_{i + 1}', value=600, min=0, max=100000, vary=True)
-        params_ode.add(f'beta_{i + 1}', value=.5, min=0, max=1, vary=True)
-        params_ode.add(f'A_{i + 1}', value=1.0, min=0.5, max=2, vary=True)
+    i = 0
+    params_ode.add(f'tau_{i + 1}', value=600, min=0, max=100000, vary=True)
+    params_ode.add(f'beta_{i + 1}', value=.5, min=0, max=1, vary=True)
+    params_ode.add(f'A_{i + 1}', value=1.0, min=0.5, max=2, vary=True)
 
-        if t_0_equals_1 == True:
-            params_ode[f'A_{i + 1}'].vary = False
+    if t_0_equals_1 == True:
+        params_ode[f'A_{i + 1}'].vary = False
 
-    if share_stretch_factor == True:
-        for y, _ in enumerate(Data.columns.values[1:-1]):
-            params_ode[f'beta_{y + 2}'].expr = 'beta_1'
 
     ### Fitting the Data
     results_Model2 = minimize(resid_global, params_ode, method='leastsq', args=(time_fit, Data, limit, resid, param_dict), nan_policy='omit')
@@ -321,11 +318,11 @@ def fit_stretched_exponential(Data, Fit_range, t_0_equals_1, share_stretch_facto
 
     ### Extract important Parameters from Fit
     for i, _ in enumerate(Data.columns.values[1:]):
-        yfit1 = post_Fitting(results_Model2, limit, time_fit, Data_fit[param_dict['Sample Name'][i]]*0, nan_beg, nan_end, i)
-        Data_fit[str('Fit_' + param_dict['Sample Name'][i])] = yfit1
-        tau_fit = np.append(tau_fit, results_Model2.params[f'tau_{i + 1}'].value)
-        beta_fit = np.append(beta_fit, results_Model2.params[f'beta_{i+1}'].value)
-        A_parameter = np.append(A_parameter, results_Model2.params[f'A_{i + 1}'].value)
+        yfit1 = post_Fitting(results_Model2, limit, time_fit, Data_fit[param_dict['Sample Name'][0]]*0, nan_beg, nan_end, i)
+        Data_fit[str('Fit_' + param_dict['Sample Name'][0])] = yfit1
+        tau_fit = np.append(tau_fit, results_Model2.params[f'tau_1'].value)
+        beta_fit = np.append(beta_fit, results_Model2.params[f'beta_1'].value)
+        A_parameter = np.append(A_parameter, results_Model2.params[f'A_1'].value)
 
     gamma_fit = gamma(1/beta_fit)
     tau_avg = tau_fit/beta_fit*gamma_fit
