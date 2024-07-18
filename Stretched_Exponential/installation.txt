@@ -1,0 +1,7 @@
+install packages lmfit and ipywidgets by running:
+
+pip install lmfit
+
+and 
+
+pip install -U ipywidgets
