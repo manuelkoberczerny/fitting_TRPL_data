@@ -20,7 +20,7 @@ def make_widgets(data_folder):
     file_selector = widgets.SelectMultiple(options=filtered_files, description='Files')
     
     folder = os.getcwd()
-    Ref_Files = os.listdir(str(folder + '\TRPL_Files'))[::-1]
+    Ref_Files = os.listdir(str(folder + '\Ref_Files'))[::-1]
     reference_selector = widgets.Select(options=Ref_Files, description='Ref. Files')
 
     return file_selector, reference_selector
@@ -46,7 +46,7 @@ def unpack_Info(args):
 def Fluence_Calc(wavelength, laser_reference_file, laser_intensity):
     """ Unpack Ref Data File"""
     laser_folder = os.getcwd()
-    wl400, wl505, wl630 = np.loadtxt(str(laser_folder + '\TRPL_Files\\'+laser_reference_file), unpack=True, skiprows=1)
+    wl400, wl505, wl630 = np.loadtxt(str(laser_folder + '\Ref_Files\\'+laser_reference_file), unpack=True, skiprows=1)
 
     intensity = laser_intensity
 
