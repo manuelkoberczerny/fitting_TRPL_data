@@ -26,8 +26,19 @@ def make_widgets(data_folder):
     return file_selector, reference_selector
 
 def unpack_Info(args):
-    names, info = np.loadtxt(args, unpack=True, skiprows=1, max_rows=24, delimiter=':', dtype=str, encoding='unicode_escape')
-    sample_name = str(info[np.where(names == '  Sample ')])[2:-2]
+    sample_names, info = np.loadtxt(args, unpack=True, skiprows=1, max_rows=2, delimiter=':', dtype=str, encoding='unicode_escape')
+    sample_name = str(info[np.where(sample_names == '  Sample ')])[2:-2]
+
+    with open(args, 'rb') as file:
+    # read all lines using readline()
+        lines = file.readlines()
+        for line in lines:
+            # check if string present on a current line
+            word = b'  Exc_Wavelength :'
+            if line.find(word) != -1:
+                rows_to_skip = lines.index(line)
+
+    names, info = np.loadtxt(args, unpack=True, skiprows=rows_to_skip, max_rows=21, delimiter=':', dtype=str, encoding='unicode_escape')
     wavelength = float(str(info[np.where(names == '  Exc_Wavelength ')])[3:-4])  # in nm
     sync_frequency = float(str(info[np.where(names == '  Sync_Frequency ')])[3:-4])  # in Hz
     signal_rate = float(str(info[np.where(names == '  Signal_Rate ')])[3:-5])  # in cps
