@@ -10,6 +10,7 @@ Create and activate a new Python (version 3.10) virtual environment e.g. using [
 git clone https://github.com/manuelkoberczerny/fitting_TRPL_data.git
 ```
 
+
 # Usage
 ## 1. Stretched Exponential Fitting
 need to write
