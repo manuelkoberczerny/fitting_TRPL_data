@@ -10,6 +10,12 @@ Create and activate a new Python (version 3.10) virtual environment e.g. using [
 git clone https://github.com/manuelkoberczerny/fitting_TRPL_data.git
 ```
 
+To use the jupyter notebook widgets run:
+```
+pip install -U ipywidgets
+```
+
+
 
 # Usage
 ## 1. Stretched Exponential Fitting
