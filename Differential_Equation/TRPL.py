@@ -78,16 +78,25 @@ def get_args():
 
 
 def unpack_Info(args):
-    names, info = np.loadtxt(args, unpack=True, skiprows=1, max_rows=24, delimiter=' : ', dtype=str)
-    sample_name = str(info[np.where(names == '  Sample')])[2:-2]
+    sample_names, info = np.loadtxt(args, unpack=True, skiprows=1, max_rows=2, delimiter=':', dtype=str, encoding='unicode_escape')
+    sample_name = str(info[np.where(sample_names == '  Sample ')])[2:-2]
 
-    wavelength = float(str(info[np.where(names == '  Exc_Wavelength')])[2:-4])  # in nm
+    with open(args, 'rb') as file:
+    # read all lines using readline()
+        lines = file.readlines()
+        for line in lines:
+            # check if string present on a current line
+            word = b'  Exc_Wavelength :'
+            if line.find(word) != -1:
+                rows_to_skip = lines.index(line)
 
-    sync_frequency = float(str(info[np.where(names == '  Sync_Frequency')])[2:-4])  # in Hz
-    signal_rate = float(str(info[np.where(names == '  Signal_Rate')])[2:-5])  # in cps
+    names, info = np.loadtxt(args, unpack=True, skiprows=rows_to_skip, max_rows=21, delimiter=':', dtype=str, encoding='unicode_escape')
+    wavelength = float(str(info[np.where(names == '  Exc_Wavelength ')])[3:-4])  # in nm
+    sync_frequency = float(str(info[np.where(names == '  Sync_Frequency ')])[3:-4])  # in Hz
+    signal_rate = float(str(info[np.where(names == '  Signal_Rate ')])[3:-5])  # in cps
     pile_up = signal_rate / sync_frequency * 100  # in %
 
-    attenuation = str(info[np.where(names == '  Exc_Attenuation')])[2:-6]
+    attenuation = str(info[np.where(names == '  Exc_Attenuation ')])[3:-6]
     if attenuation == 'open':
         attenuation = 1
     else:
