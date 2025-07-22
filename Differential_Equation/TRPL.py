@@ -38,7 +38,7 @@ def get_args():
 
     req = parser.add_argument_group('Main', gooey_options={'columns': 1})
     req.add_argument('-dp', '--data_path', nargs='*', widget="MultiFileChooser", help="Path to the Datafile(s)",
-                     gooey_options={'wildcard': "TRPL' files (TRPL_*.dat) |TRPL_*.dat|" "All files (*.*)|*.*",
+                     gooey_options={'wildcard': "TRPL' files (*.dat) |TRPL_*.dat|" "All files (*.*)|*.*",
                                     'full_width': True})
 
     opt = parser.add_argument_group('Measurement Settings', gooey_options={'columns': 2})
@@ -131,7 +131,17 @@ def unpack_Data(FileName):
 
     ## First the data is imported, the background removed, the maximum shifted to t=0 and everything is normalized to Exc_Density
 
-    time1, Data1 = np.loadtxt(FileName, unpack=True, skiprows=76)
+    with open(FileName, 'rb') as file:
+    # read all lines using readline()
+        lines = file.readlines()
+        for line in lines:
+            # check if string present on a current line
+            word = b'Time [ns]'
+            if word in line:#line.find(word) != -1:
+                rows_to_skip = lines.index(line)+1
+
+
+    time1, Data1 = np.loadtxt(FileName, unpack=True, skiprows=rows_to_skip)
     Data1 = np.array(Data1)
     len_Data = len(Data1)
 
