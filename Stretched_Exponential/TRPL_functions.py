@@ -297,6 +297,8 @@ def import_data(data_folder, FileNames, laser_reference_file, laser_intensity):
     for i, _ in enumerate(FileNames):
         Data = Data.rename({str(i): param_dict['Sample Name'][i]}, axis='columns')
 
+    print(param_dict)
+    print(sample_name)
 
     return Data, param_dict
 
